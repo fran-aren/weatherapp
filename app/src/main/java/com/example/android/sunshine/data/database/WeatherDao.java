@@ -1,5 +1,6 @@
 package com.example.android.sunshine.data.database;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
@@ -13,5 +14,16 @@ public interface WeatherDao {
     void bulkInsert(WeatherEntry... weather);
 
     @Query("SELECT * FROM weather WHERE date = :date")
-    WeatherEntry getWeatherByDate(Date date);
+    LiveData<WeatherEntry> getWeatherByDate(Date date);
+
+    @Query("SELECT COUNT(id) FROM weather WHERE date >= :date")
+    int countAllFutureWeather(Date date);
+
+    /**
+     * Deletes any weather data older than the given day
+     *
+     * @param date The date to delete all prior weather from (exclusive)
+     */
+    @Query("DELETE FROM weather WHERE date < :date")
+    void deleteOldWeather(Date date);
 }
